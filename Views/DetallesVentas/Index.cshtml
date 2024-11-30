@@ -1,0 +1,51 @@
+﻿@model Comprobación.Models.DetallesVentasViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Detalles Ventas</h1>
+
+<!--Mostrar datos de la venta-->
+@if (Model.VentaSeleccionada != null)
+{
+    <div class="alert alert-info">
+        <h4>Información de la Venta Seleccionada</h4>
+        <p><strong>Fecha:</strong> @Model.VentaSeleccionada.FechaVenta</p>
+        <p><strong>Total:</strong> @Model.VentaSeleccionada.TotalVenta</p>
+        <p><strong>Cliente:</strong> @Model.VentaSeleccionada.Cliente.ApellidoCliente</p>
+        <p><strong>Empleado:</strong> @Model.VentaSeleccionada.Empleado.ApellidoEmpleado</p>
+    </div>
+}
+<h2>Crear Detalles de la venta</h2>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.DetallesVentas.First().Cantidad)</th>
+            <th>@Html.DisplayNameFor(model => model.DetallesVentas.First().PrecioUnitario)</th>
+            <th>@Html.DisplayNameFor(model => model.DetallesVentas.First().Subtotal)</th>
+            <th>@Html.DisplayNameFor(model => model.DetallesVentas.First().Venta)</th>
+            <th>@Html.DisplayNameFor(model => model.DetallesVentas.First().Producto)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DetallesVentas)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Cantidad)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrecioUnitario)</td>
+                <td>@Html.DisplayFor(modelItem => item.Subtotal)</td>
+                <td>@Html.DisplayFor(modelItem => item.Venta.IdVenta)</td>
+                <td>@Html.DisplayFor(modelItem => item.Producto.CodigoProducto)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.DetalleVentaId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.DetalleVentaId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.DetalleVentaId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

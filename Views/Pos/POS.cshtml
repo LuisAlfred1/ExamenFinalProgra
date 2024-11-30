@@ -1,0 +1,249 @@
+﻿@model IEnumerable<Comprobación.Models.Producto>
+@{
+	ViewData["Title"] = "POS - Lista de Productos";
+}
+<div class="container my-5">
+    <h1 class="text-center">Productos - (Punto de Venta)</h1>
+</div>
+
+<!-- Formulario de búsqueda -->
+<form method="get" action="/Pos/POS" class="mb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" name="filtroNombre" class="form-control"
+                   placeholder="Buscar por nombre"
+                   value="@ViewBag.FiltroNombre" />
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="filtroCodigo" class="form-control"
+                   placeholder="Buscar por código"
+                   value="@ViewBag.FiltroCodigo" />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <!-- Grilla de productos -->
+    <div class="col-8">
+        <h4>Productos</h4>
+        <div class="row" id="grillaProductos">
+            @foreach (var producto in Model)
+            {
+                <div class="col-4 mb-3">
+                    <div class="card">
+                        <img src="@(string.IsNullOrEmpty(producto.FotoProducto) ? "/images/default-product.png" : producto.FotoProducto)"
+                             class="card-img-top"
+                             style="max-height:200px; object-fit:cover;"
+                             alt="@producto.NombreProducto">
+                        <div class="card-body">
+                            <h5 class="card-title">@producto.NombreProducto</h5>
+                            <p class="card-text">Código: @producto.CodigoProducto</p>
+                            <p class="card-text">Precio: Q.@producto.PrecioProducto</p>
+                            <p class="card-text">Stock: @producto.StockProducto</p>
+                            <button class="btn btn-success w-100 add-to-cart"
+                                    data-id="@producto.IdProdcuto"
+                                    data-nombre="@producto.NombreProducto"
+                                    data-precio="@producto.PrecioProducto">
+                                <i class="bi bi-cart-plus"></i> Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Carrito y Finalización de compra -->
+    <div class="col-4">
+        <h4>Carrito</h4>
+        <div class="list-group" id="cart"></div>
+        <div class="mt-3">
+            <h5>Total: <span id="total">Q.0.00</span></h5>
+            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#finalizarCompra">
+                <i class="bi bi-cash"></i> Finalizar Compra
+            </button>
+        </div>
+    </div>  
+</div>  
+
+<!-- Modal para finalizar compra -->
+<div class="modal fade" id="finalizarCompra" tabindex="-1" aria-labelledby="finalizarCompraLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="finalizarCompraLabel">Finalizar Compra</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioFinalizarCompra">
+                    <div class="mb-3">
+                        <label for="cliente" class="form-label">Seleccione al Cliente</label>
+                        <select class="form-select" id="cliente" name="cliente" required>
+                            <option value="">Seleccione ...</option>
+                            @foreach (var cliente in ViewBag.Clientes as List<Comprobación.Models.Cliente>)
+                            {
+                                <option value="@cliente.IdCliente">@cliente.NombreCliente</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="empleado" class="form-label">Seleccione al Empleado</label>
+                        <select class="form-select" id="empleado" name="empleado" required>
+                            <option value="">Seleccione...</option>
+                            @foreach (var empleado in ViewBag.Empleados as List<Comprobación.Models.Empleado>)
+                            {
+                                <option value="@empleado.IdEmpleado">@empleado.NombreEmpleado</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="botonFinalizarCompra">
+                    <i class="bi bi-check-circle"></i> Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+    </div
+
+
+<!----><script>
+           // Variables del carrito
+           const cart = document.getElementById("cart");
+           const totalElement = document.getElementById("total");
+           let carrito = [];
+
+           // Actualizar el carrito en la vista
+           function actualizarCarrito() {
+               cart.innerHTML = "";
+               let total = 0;
+
+               carrito.forEach((producto, index) => {
+                   const item = document.createElement("div");
+                   item.className = "list-group-item d-flex justify-content-between align-items-center";
+                   item.innerHTML = `
+                           <span>${producto.nombre} (Q.${producto.precio} x ${producto.cantidad})</span>
+                           <div>
+                               <button class="btn btn-sm btn-secondary" onclick="decrementarCantidad(${index})">
+                                   <i class="bi bi-dash-circle"></i>
+                               </button>
+                               <button class="btn btn-sm btn-primary" onclick="incrementarCantidad(${index})">
+                                   <i class="bi bi-plus-circle"></i>
+                               </button>
+                               <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${index})">
+                                   <i class="bi bi-trash"></i>
+                               </button>
+                           </div>
+                       `;
+                   cart.appendChild(item);
+                   total += producto.precio * producto.cantidad;
+               });
+
+               totalElement.textContent = `Q.${total.toFixed(2)}`;
+           }
+
+           // Función para agregar al carrito
+           function agregarAlCarrito(id, nombre, precio) {
+               const productoExistente = carrito.find(producto => producto.id === id);
+               if (productoExistente) {
+                   productoExistente.cantidad++;
+               } else {
+                   carrito.push({ id, nombre, precio: parseFloat(precio), cantidad: 1 });
+               }
+               actualizarCarrito();
+           }
+
+           // Incrementar cantidad
+           function incrementarCantidad(index) {
+               carrito[index].cantidad++;
+               actualizarCarrito();
+           }
+
+           // Decrementar cantidad
+           function decrementarCantidad(index) {
+               if (carrito[index].cantidad > 1) {
+                   carrito[index].cantidad--;
+               } else {
+                   eliminarProducto(index);
+               }
+               actualizarCarrito();
+           }
+
+           // Eliminar producto
+           function eliminarProducto(index) {
+               carrito.splice(index, 1);
+               actualizarCarrito();
+           }
+
+           // Finalizar compra
+           document.getElementById("botonFinalizarCompra").addEventListener("click", async function () {
+               const clienteId = document.getElementById("cliente").value;
+               const empleadoId = document.getElementById("empleado").value;
+
+               if (!clienteId || !empleadoId) {
+                   alert("Seleccione un cliente y un empleado para finalizar la compra.");
+                   return;
+               }
+
+               if (carrito.length === 0) {
+                   alert("El carrito está vacío.");
+                   return;
+               }
+
+               const datosVenta = {
+                   IdClienteEnVenta: clienteId,
+                   IdEmpleadoEnVenta: empleadoId,
+                   Detalles: carrito.map(producto => ({
+                       ProductoId: producto.id,
+                       Cantidad: producto.cantidad,
+                       PrecioUnitario: producto.precio
+                   }))
+               };
+
+               try {
+                   const respuesta = await fetch("/Pos/CrearVenta", {
+                       method: "POST",
+                       headers: {
+                           "Content-Type": "application/json"
+                       },
+                       body: JSON.stringify(datosVenta)
+                   });
+
+                   if (!respuesta.ok) {
+                       const error = await respuesta.text();
+                       alert(`Error al realizar la compra: ${error}`);
+                       return;
+                   }
+
+                   const resultado = await respuesta.json();
+                   alert("Compra realizada con éxito");
+
+                   const url = `/Pos/ImprimirFacturaPorVenta?idVenta=${resultado.ventaId}`;
+                   console.log(url);
+                   window.location.href = url
+
+                   carrito = [];
+                   actualizarCarrito();
+                   document.getElementById("formularioFinalizarCompra").reset();
+                   bootstrap.Modal.getInstance(document.getElementById("finalizarCompra")).hide();
+               } catch (error) {
+                   console.error("Error al procesar la compra:", error);
+                   alert("Hubo un error al realizar la compra.");
+               }
+           });
+
+           // Manejar botones de "Agregar al Carrito"
+           document.querySelectorAll(".add-to-cart").forEach(button => {
+               button.addEventListener("click", function () {
+                   const id = this.dataset.id;
+                   const nombre = this.dataset.nombre;
+                   const precio = this.dataset.precio;
+
+                   agregarAlCarrito(id, nombre, precio);
+               });
+           });
+</script>

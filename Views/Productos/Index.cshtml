@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Comprobación.Models.Producto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1><i class="bi bi-box2-fill"></i> Productos</h1>
+
+<!-- Mostrar mensaje si existe -->
+@if (ViewData["Mensaje"] != null)
+{
+    <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+}
+
+<!-- Formulario de filtros -->
+<form method="get" asp-action="Index">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="filtroNombre" class="form-label">Filtrar por Nombre:</label>
+            <input type="text" id="filtroNombre" name="filtroNombre" class="form-control" value="@ViewData["filtroNombre"]" placeholder="Nombre del producto">
+        </div>
+        <div class="col-md-4">
+            <label for="filtroCodigo" class="form-label">Filtrar por Código:</label>
+            <input type="text" id="filtroCodigo" name="filtroCodigo" class="form-control" value="@ViewData["filtroCodigo"]" placeholder="Código del producto">
+        </div>
+        <div class="col-md-4 align-self-end">
+            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+            <a asp-action="Index" class="btn btn-secondary">Limpiar Filtros</a>
+        </div>
+    </div>
+</form>
+
+<!-- Botón para agregar un nuevo producto -->
+<button type="button" class="btn btn-outline-success mb-3">
+    <a asp-action="Create"><i class="bi bi-database-fill-add"></i> Agregar Producto</a>
+</button>
+
+<!-- Tabla de resultados -->
+<!-- Tabla de productos -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Seleccionar</th>
+            <th>@Html.DisplayNameFor(model => model.CodigoProducto)</th>
+            <th>@Html.DisplayNameFor(model => model.NombreProducto)</th>
+            <th>@Html.DisplayNameFor(model => model.DescripcionProducto)</th>
+            <th>@Html.DisplayNameFor(model => model.PrecioProducto)</th>
+            <th>@Html.DisplayNameFor(model => model.StockProducto)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="product-checkbox" data-id="@item.IdProdcuto" data-name="@item.NombreProducto" data-code="@item.CodigoProducto" data-price="@item.PrecioProducto">
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.CodigoProducto)</td>
+                    <td>@Html.DisplayFor(modelItem => item.NombreProducto)</td>
+                    <td>@Html.DisplayFor(modelItem => item.DescripcionProducto)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PrecioProducto)</td>
+                    <td>@Html.DisplayFor(modelItem => item.StockProducto)</td>
+                    <td>
+                        <!--Nuevo-->
+                        <button type="button" class="btn btn-outline-primary">
+                            <a asp-action="PreviewPurchase" asp-route-id="@item.IdProdcuto"><i class="bi bi-cart"></i> Comprar</a>
+                        </button>
+
+                        <button type="button" class="btn btn-outline-warning">
+                            <a asp-action="Edit" asp-route-id="@item.IdProdcuto"><i class="bi bi-pencil-square"></i> </a>
+                        </button>
+                        <button type="button" class="btn btn-outline-info">
+                            <a asp-action="Details" asp-route-id="@item.IdProdcuto"><i class="bi bi-person-square"></i> </a>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger">
+                            <a asp-action="Delete" asp-route-id="@item.IdProdcuto"><i class="bi bi-person-x"></i> </a>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center">No se encontraron productos.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -1,0 +1,41 @@
+﻿@model ProductoPreviewViewModel
+
+<h1>Previsualización de Compra</h1>
+
+<div class="card">
+    <img src="@Model.FotoProducto" class="card-img-top" alt="@Model.NombreProducto" style="max-width: 300px;">
+    <div class="card-body">
+        <h5 class="card-title">@Model.NombreProducto</h5>
+        <p class="card-text">
+            <strong>Código:</strong> @Model.CodigoProducto<br>
+            <strong>Precio:</strong> @Model.PrecioProducto.ToString("C")<br>
+            <strong>Stock Disponible:</strong> @Model.StockProducto
+        </p>
+
+        <form asp-action="ConfirmPurchase" asp-controller="Productos" method="post">
+            <input type="hidden" name="IdProducto" value="@Model.IdProducto">
+            <div class="mb-3">
+                <label for="CantidadSeleccionada" class="form-label">Cantidad:</label>
+                <input type="number" id="CantidadSeleccionada" name="CantidadSeleccionada" class="form-control"
+                       min="1" max="@Model.StockProducto" value="1">
+            </div>
+            <p><strong>Total:</strong> <span id="Total">@Model.PrecioProducto.ToString("C")</span></p>
+
+            <button type="submit" class="btn btn-success">Aceptar</button>
+            <a asp-action="Index" asp-controller="Productos" class="btn btn-danger">Rechazar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const precio = @Model.PrecioProducto;
+        const cantidadInput = document.getElementById('CantidadSeleccionada');
+        const totalSpan = document.getElementById('Total');
+
+        cantidadInput.addEventListener('input', function () {
+            const cantidad = parseInt(cantidadInput.value) || 1;
+            totalSpan.innerText = (precio * cantidad).toFixed(2) + " Q";
+        });
+    </script>
+}

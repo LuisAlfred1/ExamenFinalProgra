@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Comprobación.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1><i class="bi bi-person-circle"></i> Clientes</h1>
+
+<!--<p>
+    <a asp-action="Create"><i class="bi bi-person-fill-add"></i> Agregar Cliente</a>
+</p>-->
+<button type="button" class="btn btn-outline-success">
+    <a asp-action="Create"><i class="bi bi-person-fill-add"></i> Agregar Cliente</a>
+</button>
+<table class="table mt-2">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NitCliente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NombreCliente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApellidoCliente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DireccionCliente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TelefonoCliente)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NitCliente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NombreCliente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApellidoCliente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DireccionCliente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TelefonoCliente)
+            </td>
+            <td>
+                    <button type="button" class="btn btn-warning"><a asp-action="Edit" asp-route-id="@item.IdCliente"><i class="bi bi-pencil-square"></i></a></button>
+                    <button type="button" class="btn btn-info"><a asp-action="Details" asp-route-id="@item.IdCliente"><i class="bi bi-person-square"></i></a></button>
+                    <button type="button" class="btn btn-danger"><a asp-action="Delete" asp-route-id="@item.IdCliente"><i class="bi bi-person-x"></i></a></button>
+                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
