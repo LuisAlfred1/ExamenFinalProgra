@@ -64,10 +64,6 @@
                     <td>@Html.DisplayFor(modelItem => item.PrecioProducto)</td>
                     <td>@Html.DisplayFor(modelItem => item.StockProducto)</td>
                     <td>
-                        <!--Nuevo-->
-                        <button type="button" class="btn btn-outline-primary">
-                            <a asp-action="PreviewPurchase" asp-route-id="@item.IdProdcuto"><i class="bi bi-cart"></i> Comprar</a>
-                        </button>
 
                         <button type="button" class="btn btn-outline-warning">
                             <a asp-action="Edit" asp-route-id="@item.IdProdcuto"><i class="bi bi-pencil-square"></i> </a>
